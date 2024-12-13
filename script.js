@@ -23,12 +23,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Atualizar prévia da imagem do certificado
     function updatePreviewImage(className) {
+        const imagePreview = document.getElementById("imagePreview");
+        if (!imagePreview) {
+            console.error("Elemento de prévia da imagem não encontrado!");
+            return;
+        }
+
+        const fileName = className.toLowerCase().replace(/ /g, "_");
         const imageURL = `${baseURL}${fileName}`;
+    
         selectedClassImage = imageURL;
-        imagePreviewCanvas.src = imageURL;
-        imagePreviewCanvas.alt = `Certificado - ${className}`;
+        imagePreview.src = imageURL;
+        imagePreview.alt = `Certificado - ${className}`;
         console.log("URL da imagem carregada:", imageURL);
     }
+
 
     // Listener para mudança de classe
     classSelector.addEventListener("change", () => {
