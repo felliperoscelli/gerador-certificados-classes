@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Atualizar prévia da imagem do certificado
     function updatePreviewImage(className) {
-        const imageURL = `${baseURL}${className.toLowerCase().replace(/ /g, "_")}`;
+        const imageURL = `${baseURL}${fileName}`;
         selectedClassImage = imageURL;
         imagePreviewCanvas.src = imageURL;
         imagePreviewCanvas.alt = `Certificado - ${className}`;
