@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.textAlign = "center";
             ctx.fillText(clubNameInput.value || "Clube de Exemplo", canvas.width / 2, canvas.height - 20);
         };
-        img.src = `certificates/${selectedClassImage}`;
+        img.src = `./certificates/${selectedClassImage}`;
     });
 
     // Gerar certificados
