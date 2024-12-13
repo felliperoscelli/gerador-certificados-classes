@@ -1,14 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const certificatesContainer = document.getElementById("certificatesContainer");
     const classSelector = document.getElementById("classSelector");
     const clubNameInput = document.getElementById("clubName");
-    const downloadZipButton = document.getElementById("downloadZip");
+    const namesList = document.getElementById("namesList");
     const fontSelector = document.getElementById("fontSelector");
     const fontSizeSelector = document.getElementById("fontSizeSelector");
     const fontPreviewText = document.getElementById("fontPreviewText");
-    const namesList = document.getElementById("namesList");
-    const imagePreviewCanvas = document.getElementById("imagePreviewCanvas");
-    let certificadosSVG = [];
+    const imagePreview = document.getElementById("imagePreview");
+    const certificatesContainer = document.getElementById("certificatesContainer");
+    const downloadZipButton = document.getElementById("downloadZip");
+
+    const baseURL = "./certificates/";
+    let selectedClassImage = "";
     let selectedFont = fontSelector.value;
     let selectedFontSize = parseInt(fontSizeSelector.value, 10);
 
@@ -16,7 +18,25 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateFontPreview() {
         fontPreviewText.style.fontFamily = selectedFont;
         fontPreviewText.style.fontSize = `${selectedFontSize}px`;
+        fontPreviewText.innerText = "Exemplo do Nome";
     }
+
+    // Atualizar prévia da imagem do certificado
+    function updatePreviewImage(className) {
+        const imageURL = `${baseURL}${className.toLowerCase().replace(/ /g, "_")}.png`;
+        selectedClassImage = imageURL;
+        imagePreview.src = imageURL;
+        imagePreview.alt = `Certificado - ${className}`;
+        console.log("URL da imagem carregada:", imageURL);
+    }
+
+    // Listener para mudança de classe
+    classSelector.addEventListener("change", () => {
+        const selectedClass = classSelector.value;
+        if (selectedClass) {
+            updatePreviewImage(selectedClass);
+        }
+    });
 
     // Listener para mudança de fonte
     fontSelector.addEventListener("change", () => {
@@ -24,38 +44,26 @@ document.addEventListener("DOMContentLoaded", () => {
         updateFontPreview();
     });
 
-    // Listener para mudança de tamanho
+    // Listener para mudança de tamanho da fonte
     fontSizeSelector.addEventListener("input", () => {
         selectedFontSize = parseInt(fontSizeSelector.value, 10);
         updateFontPreview();
     });
 
-    // Atualizar prévia da imagem
-    classSelector.addEventListener("change", () => {
-        const canvas = imagePreviewCanvas;
-        const ctx = canvas.getContext("2d");
-        const selectedClassImage = classSelector.value;
-
-        const img = new Image();
-        img.onload = () => {
-            canvas.width = 400;
-            canvas.height = (img.height / img.width) * 400;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            ctx.font = "20px Arial";
-            ctx.fillStyle = "black";
-            ctx.textAlign = "center";
-            ctx.fillText(clubNameInput.value || "Clube de Exemplo", canvas.width / 2, canvas.height - 20);
-        };
-        img.src = `./certificates/${selectedClassImage}`;
-    });
-
     // Gerar certificados
     document.getElementById("certificateForm").addEventListener("submit", (e) => {
         e.preventDefault();
+
+        const clubName = clubNameInput.value.trim();
         const names = namesList.value.trim().split("\n").filter((name) => name);
-        if (!classSelector.value) {
+
+        if (!selectedClassImage) {
             alert("Por favor, selecione uma classe.");
+            return;
+        }
+
+        if (!clubName) {
+            alert("Por favor, insira o nome do clube.");
             return;
         }
 
@@ -65,7 +73,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         certificatesContainer.innerHTML = ""; // Limpar certificados anteriores
-        certificadosSVG = []; // Limpar lista de certificados
 
         names.forEach((name) => {
             const canvas = document.createElement("canvas");
@@ -79,47 +86,45 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Desenhar o modelo do certificado
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-                // Nome do clube
-                ctx.font = "20px Arial";
-                ctx.fillStyle = "black";
+                // Adicionar o nome do clube
+                ctx.font = "30px Arial";
+                ctx.fillStyle = "blue";
                 ctx.textAlign = "center";
-                ctx.fillText(clubNameInput.value, canvas.width / 2, canvas.height - 50);
+                ctx.fillText(clubName, canvas.width / 2, canvas.height / 1.1);
 
-                // Nome do participante
+                // Adicionar o nome
                 ctx.font = `${selectedFontSize}px ${selectedFont}`;
+                ctx.fillStyle = "black";
                 ctx.fillText(name, canvas.width / 2, canvas.height / 2);
 
                 // Adicionar ao contêiner
                 const certificateImg = document.createElement("img");
                 certificateImg.src = canvas.toDataURL("image/png");
                 certificateImg.alt = `Certificado - ${name}`;
-                certificatesContainer.appendChild(certificateImg);
+                certificateImg.style.width = "100%";
+                certificateImg.style.maxWidth = "800px";
+                certificateImg.style.margin = "10px 0";
 
-                // Adicionar ao ZIP
-                certificadosSVG.push({
-                    name: name,
-                    data: canvas.toDataURL("image/png"),
-                });
+                certificatesContainer.appendChild(certificateImg);
             };
 
-            img.src = `certificates/${classSelector.value}`;
+            img.src = selectedClassImage;
         });
     });
 
-    // Baixar ZIP
+    // Baixar todos os certificados em ZIP
     downloadZipButton.addEventListener("click", () => {
-        if (certificadosSVG.length === 0) {
-            alert("Nenhum certificado para baixar.");
+        const zip = new JSZip();
+
+        const images = certificatesContainer.querySelectorAll("img");
+        if (images.length === 0) {
+            alert("Nenhum certificado para baixar. Por favor, gere os certificados primeiro.");
             return;
         }
 
-        const zip = new JSZip();
-        certificadosSVG.forEach((certificado, index) => {
-            const data = certificado.data.split(",")[1];
+        images.forEach((img, index) => {
+            const data = img.src.split(",")[1]; // Apenas a parte base64
             zip.file(`certificado_${index + 1}.png`, data, { base64: true });
-       ... (adicionando continuidade).
-
-```javascript
         });
 
         zip.generateAsync({ type: "blob" }).then((content) => {
@@ -127,6 +132,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Atualizar prévia inicial
+    // Inicializar prévia da fonte
     updateFontPreview();
 });
