@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const fontSelector = document.getElementById("fontSelector");
     const fontSizeSelector = document.getElementById("fontSizeSelector");
     const fontPreviewText = document.getElementById("fontPreviewText");
-    const imagePreview = document.getElementById("imagePreview");
+    const imagePreviewContainer = document.getElementById("imagePreviewContainer");
     const certificatesContainer = document.getElementById("certificatesContainer");
     const downloadZipButton = document.getElementById("downloadZip");
 
