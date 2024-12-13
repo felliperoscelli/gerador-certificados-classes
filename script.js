@@ -25,8 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function updatePreviewImage(className) {
         const imageURL = `${baseURL}${className.toLowerCase().replace(/ /g, "_")}.png`;
         selectedClassImage = imageURL;
-        imagePreview.src = imageURL;
-        imagePreview.alt = `Certificado - ${className}`;
+        imagePreviewContainer.src = imageURL;
+        imagePreviewContainer.alt = `Certificado - ${className}`;
         console.log("URL da imagem carregada:", imageURL);
     }
 
