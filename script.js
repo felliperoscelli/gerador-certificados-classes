@@ -22,21 +22,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Atualizar prévia da imagem do certificado
-    function updatePreviewImage(className) {
-        const imagePreviewCanvas = document.getElementById("imagePreviewCanvas");
-        if (!imagePreviewCanvas) {
-            console.error("Elemento de prévia da imagem não encontrado!");
-            return;
-        }
+function updatePreviewImage(className) {
+    const canvas = document.getElementById("imagePreviewCanvas");
+    const ctx = canvas.getContext("2d");
 
-        const fileName = className.toLowerCase().replace(/ /g, "_");
-        const imageURL = `${baseURL}${fileName}`;
-    
-        selectedClassImage = imageURL;
-        imagePreview.src = imageURL;
-        imagePreview.alt = `Certificado - ${className}`;
-        console.log("URL da imagem carregada:", imageURL);
+    if (!canvas || !ctx) {
+        console.error("Canvas ou contexto de desenho não encontrado!");
+        return;
     }
+
+    const fileName = className.toLowerCase().replace(/ /g, "_");
+    const imageURL = `${baseURL}${fileName}`;
+
+    const img = new Image();
+    img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        console.log("Imagem carregada no canvas:", imageURL);
+    };
+
+    img.onerror = () => {
+        console.error("Erro ao carregar a imagem:", imageURL);
+    };
+
+    img.src = imageURL;
+    selectedClassImage = imageURL;
+}
+
 
 
     // Listener para mudança de classe
