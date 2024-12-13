@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const certificatesContainer = document.getElementById("certificatesContainer");
     const downloadZipButton = document.getElementById("downloadZip");
 
-    const baseURL = "./certificates/";
+    const baseURL = "certificates/";
     let selectedClassImage = "";
     let selectedFont = fontSelector.value;
     let selectedFontSize = parseInt(fontSizeSelector.value, 10);
