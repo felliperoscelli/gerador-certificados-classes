@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const fontSelector = document.getElementById("fontSelector");
     const fontSizeSelector = document.getElementById("fontSizeSelector");
     const fontPreviewText = document.getElementById("fontPreviewText");
-    const imagePreviewContainer = document.getElementById("imagePreviewContainer");
+    const imagePreviewCanvas = document.getElementById("imagePreviewCanvas");
     const certificatesContainer = document.getElementById("certificatesContainer");
     const downloadZipButton = document.getElementById("downloadZip");
 
@@ -25,8 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function updatePreviewImage(className) {
         const imageURL = `${baseURL}${className.toLowerCase().replace(/ /g, "_")}.png`;
         selectedClassImage = imageURL;
-        imagePreviewContainer.src = imageURL;
-        imagePreviewContainer.alt = `Certificado - ${className}`;
+        imagePreviewCanvas.src = imageURL;
+        imagePreviewCanvas.alt = `Certificado - ${className}`;
         console.log("URL da imagem carregada:", imageURL);
     }
 
