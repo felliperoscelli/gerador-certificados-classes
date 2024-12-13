@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Certificados</title>
+    <title>Gerador de Certificados por Classe</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Great+Vibes&family=Dancing+Script&family=Satisfy&family=Allura&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script defer src="script.js"></script>
 </head>
 <body>
@@ -16,12 +14,32 @@
     </header>
     <main>
         <form id="certificateForm">
-            <h3>Selecione a imagem do certificado</h3>
-            <input type="file" id="modelImage" accept="image/*" required>
+            <h3>Selecione a classe do certificado</h3>
+            <select id="classSelector" required>
+                <option value="" disabled selected>Escolha uma classe</option>
+                <option value="amigo.png">Amigo</option>
+                <option value="amigo_da_natureza.png">Amigo da Natureza</option>
+                <option value="companheiro.png">Companheiro</option>
+                <option value="companheiro_excursionismo.png">Companheiro de Excursionismo</option>
+                <option value="pesquisador.png">Pesquisador</option>
+                <option value="pesquisador_campos_bosques.png">Pesquisador de Campos e Bosques</option>
+                <option value="pioneiro.png">Pioneiro</option>
+                <option value="pioneiro_campos_bosques.png">Pioneiro de Campos e Bosques</option>
+                <option value="excursionista.png">Excursionista</option>
+                <option value="excursionista_mata.png">Excursionista na Mata</option>
+                <option value="guia.png">Guia</option>
+                <option value="guia_exploracao.png">Guia de Exploração</option>
+            </select>
+
+            <h3>Nome do Clube</h3>
+            <input type="text" id="clubName" placeholder="Insira o nome do clube" required>
+
             <div id="imagePreviewContainer">
                 <h3>Prévia da Imagem</h3>
                 <canvas id="imagePreviewCanvas"></canvas>
+                <h4 id="fontPreviewText">Fonte do Nome</h4>
             </div>
+
             <h3>Fonte e Tamanho</h3>
             <select id="fontSelector">
                 <option value="Pacifico">Pacifico</option>
@@ -31,13 +49,14 @@
                 <option value="Allura">Allura</option>
             </select>
             <input type="number" id="fontSizeSelector" value="40" min="10" max="100">
+
             <h3>Lista de Nomes</h3>
             <textarea id="namesList" placeholder="Insira os nomes (um por linha)" required></textarea>
-          <br> 
-          <button type="submit">Gerar Certificados</button>
+            <button type="submit">Gerar Certificados</button>
         </form>
         <button id="downloadZip">Baixar Todos os Certificados</button>
         <div id="certificatesContainer"></div>
     </main>
 </body>
 </html>
+
