@@ -23,8 +23,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Atualizar prévia da imagem do certificado
     function updatePreviewImage(className) {
-        const imagePreview = document.getElementById("imagePreview");
-        if (!imagePreview) {
+        const imagePreviewCanvas = document.getElementById("imagePreviewCanvas");
+        if (!imagePreviewCanvas) {
             console.error("Elemento de prévia da imagem não encontrado!");
             return;
         }
