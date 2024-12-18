@@ -2,6 +2,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const classSelector = document.getElementById("classSelector");
     const clubNameInput = document.getElementById("clubName");
     const namesList = document.getElementById("namesList");
+    const clubName = document.getElementById("clubName").value.trim();
+    const certificateDate = document.getElementById("certificateDate").value.trim();
     const fontSelector = document.getElementById("fontSelector");
     const fontSizeSelector = document.getElementById("fontSizeSelector");
     const fontPreviewText = document.getElementById("fontPreviewText");
@@ -109,11 +111,16 @@ function updatePreviewImage(className) {
                 // Desenhar o modelo do certificado
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-                // Adicionar o nome do clube
-                ctx.font = "30px Arial";
-                ctx.fillStyle = "blue";
-                ctx.textAlign = "center";
-                ctx.fillText(clubName, canvas.width / 2, canvas.height / 1.1);
+                // Nome do clube
+            ctx.font = "24px Times New Roman";
+            ctx.fillStyle = "black";
+            ctx.textAlign = "center";
+            ctx.fillText(clubName, canvas.width / 2, (3 / 4) * canvas.height);
+
+            // Data do certificado
+            ctx.font = "20px Times New Roman";
+            ctx.fillStyle = "black";
+            ctx.fillText(certificateDate, canvas.width / 2, (3 / 4) * canvas.height + 30);
 
                 // Adicionar o nome
                 ctx.font = `${selectedFontSize}px ${selectedFont}`;
