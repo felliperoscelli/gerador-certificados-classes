@@ -15,17 +15,29 @@ document.addEventListener("DOMContentLoaded", () => {
     let selectedFont = fontSelector.value;
     let selectedFontSize = parseInt(fontSizeSelector.value, 10);
 
-    // Atualizar prévia da fonte
-    function updateFontPreview() {
-        fontPreviewText.style.fontFamily = selectedFont;
-        fontPreviewText.style.fontSize = `${selectedFontSize}px`;
-        fontPreviewText.innerText = "Exemplo do Nome";
+    // Atualizar prévia da fonte diretamente na imagem de prévia
+    function updateFontPreviewOnCanvas() {
+        const ctx = imagePreviewCanvas.getContext("2d");
+        if (!selectedClassImage) return;
+
+        const img = new Image();
+        img.onload = () => {
+            ctx.clearRect(0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
+            ctx.drawImage(img, 0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
+
+            // Exemplo do nome
+            ctx.font = `${selectedFontSize}px ${selectedFont}`;
+            ctx.fillStyle = "black";
+            ctx.textAlign = "center";
+            ctx.fillText("Exemplo do Nome", imagePreviewCanvas.width / 2, imagePreviewCanvas.height / 2);
+        };
+
+        img.src = selectedClassImage;
     }
 
-    // Atualizar prévia da imagem do certificado
+    // Atualizar a prévia da imagem do certificado
     function updatePreviewImage(className) {
         const ctx = imagePreviewCanvas.getContext("2d");
-
         if (!imagePreviewCanvas || !ctx) {
             console.error("Canvas ou contexto de desenho não encontrado!");
             return;
@@ -41,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.clearRect(0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
             ctx.drawImage(img, 0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
 
-            // Exemplo do nome na prévia
+            // Atualizar prévia do nome
             ctx.font = `${selectedFontSize}px ${selectedFont}`;
             ctx.fillStyle = "black";
             ctx.textAlign = "center";
@@ -69,13 +81,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Listener para mudança de fonte
     fontSelector.addEventListener("change", () => {
         selectedFont = fontSelector.value;
-        updateFontPreview();
+        updateFontPreviewOnCanvas();
     });
 
     // Listener para mudança de tamanho da fonte
     fontSizeSelector.addEventListener("input", () => {
         selectedFontSize = parseInt(fontSizeSelector.value, 10);
-        updateFontPreview();
+        updateFontPreviewOnCanvas();
     });
 
     // Gerar certificados
@@ -146,6 +158,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Inicializar prévia da fonte
-    updateFontPreview();
+    // Inicializar prévia
+    updateFontPreviewOnCanvas();
 });
