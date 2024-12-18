@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const classSelector = document.getElementById("classSelector");
     const clubNameInput = document.getElementById("clubName");
-    const certificateDateInput = document.getElementById("certificateDate");
     const namesList = document.getElementById("namesList");
     const fontSelector = document.getElementById("fontSelector");
     const fontSizeSelector = document.getElementById("fontSizeSelector");
@@ -15,68 +14,61 @@ document.addEventListener("DOMContentLoaded", () => {
     let selectedFont = fontSelector.value;
     let selectedFontSize = parseInt(fontSizeSelector.value, 10);
 
-    // Atualizar prévia da fonte diretamente na imagem de prévia
+    // Atualizar prévia da fonte no canvas
     function updateFontPreviewOnCanvas() {
-        if (!selectedClassImage) return;
-
         const ctx = imagePreviewCanvas.getContext("2d");
-        const img = new Image();
+        if (!ctx) {
+            console.error("Contexto do canvas não encontrado!");
+            return;
+        }
 
+        // Limpar o canvas antes de redesenhar
+        ctx.clearRect(0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
+
+        // Redesenhar a imagem do certificado na prévia
+        if (selectedClassImage) {
+            const img = new Image();
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
+
+                // Adicionar o exemplo do nome na prévia
+                ctx.font = `${selectedFontSize}px ${selectedFont}`;
+                ctx.fillStyle = "black";
+                ctx.textAlign = "center";
+                ctx.fillText("Exemplo do Nome", imagePreviewCanvas.width / 2, imagePreviewCanvas.height / 2);
+            };
+            img.src = selectedClassImage;
+        } else {
+            console.warn("Nenhuma imagem de classe selecionada.");
+        }
+    }
+
+    // Atualizar a prévia da imagem
+    function updatePreviewImage(className) {
+        const fileName = className.toLowerCase().replace(/ /g, "_");
+        const imageURL = `${baseURL}${fileName}`;
+        const img = new Image();
         img.onload = () => {
             imagePreviewCanvas.width = img.width;
             imagePreviewCanvas.height = img.height;
-
-            // Limpar e desenhar a imagem
-            ctx.clearRect(0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
-            ctx.drawImage(img, 0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
-
-            // Exemplo do nome
-            ctx.font = `${selectedFontSize}px ${selectedFont}`;
-            ctx.fillStyle = "black";
-            ctx.textAlign = "center";
-            ctx.fillText("Exemplo do Nome", imagePreviewCanvas.width / 2, imagePreviewCanvas.height / 2);
+            selectedClassImage = imageURL;
+            updateFontPreviewOnCanvas(); // Atualizar prévia da fonte no canvas
+            console.log("Imagem carregada:", imageURL);
         };
-
-        img.onerror = () => {
-            console.error("Erro ao carregar a imagem:", selectedClassImage);
-        };
-
-        img.src = selectedClassImage;
+        img.onerror = () => console.error("Erro ao carregar a imagem:", imageURL);
+        img.src = imageURL;
     }
 
-    // Atualizar a prévia da imagem do certificado
-function updatePreviewImage(className) {
-    const canvas = document.getElementById("imagePreviewCanvas");
-    const ctx = canvas.getContext("2d");
-
-    if (!canvas || !ctx) {
-        console.error("Canvas ou contexto de desenho não encontrado!");
-        return;
+    // Atualizar prévia ao mudar a fonte
+    function updateFontPreview() {
+        selectedFont = fontSelector.value;
+        selectedFontSize = parseInt(fontSizeSelector.value, 10);
+        updateFontPreviewOnCanvas(); // Redesenhar a prévia no canvas
     }
 
-    // Gerar o nome do arquivo sem adicionar outra extensão
-    const fileName = className.toLowerCase().replace(/ /g, "_");
-    const imageURL = `${baseURL}${fileName}`; // Certifique-se que o caminho não adiciona .png
-
-    const img = new Image();
-    img.onload = () => {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        console.log("Imagem carregada no canvas:", imageURL);
-    };
-
-    img.onerror = () => {
-        console.error("Erro ao carregar a imagem:", imageURL);
-    };
-
-    img.src = imageURL; // Usar o caminho gerado corretamente
-    selectedClassImage = imageURL; // Atualizar o caminho da classe selecionada
-}
-
-
-    // Listener para mudança de classe
+    // Listeners para alterações na fonte ou na classe
+    fontSelector.addEventListener("change", updateFontPreview);
+    fontSizeSelector.addEventListener("input", updateFontPreview);
     classSelector.addEventListener("change", () => {
         const selectedClass = classSelector.value;
         if (selectedClass) {
@@ -84,24 +76,11 @@ function updatePreviewImage(className) {
         }
     });
 
-    // Listener para mudança de fonte
-    fontSelector.addEventListener("change", () => {
-        selectedFont = fontSelector.value;
-        updateFontPreviewOnCanvas();
-    });
-
-    // Listener para mudança de tamanho da fonte
-    fontSizeSelector.addEventListener("input", () => {
-        selectedFontSize = parseInt(fontSizeSelector.value, 10);
-        updateFontPreviewOnCanvas();
-    });
-
     // Gerar certificados
     document.getElementById("certificateForm").addEventListener("submit", (e) => {
         e.preventDefault();
 
         const clubName = clubNameInput.value.trim();
-        const certificateDate = certificateDateInput.value.trim();
         const names = namesList.value.trim().split("\n").filter((name) => name);
 
         if (!selectedClassImage) {
@@ -138,11 +117,6 @@ function updatePreviewImage(className) {
                 ctx.fillStyle = "black";
                 ctx.textAlign = "center";
                 ctx.fillText(clubName, canvas.width / 2, (3 / 4) * canvas.height);
-
-                // Data do certificado
-                ctx.font = "20px Times New Roman";
-                ctx.fillStyle = "black";
-                ctx.fillText(certificateDate, canvas.width / 2, (3 / 4) * canvas.height + 30);
 
                 // Adicionar o nome
                 ctx.font = `${selectedFontSize}px ${selectedFont}`;
