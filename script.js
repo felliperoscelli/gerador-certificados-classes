@@ -1,9 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
     const classSelector = document.getElementById("classSelector");
     const clubNameInput = document.getElementById("clubName");
+    const certificateDateInput = document.getElementById("certificateDate");
     const namesList = document.getElementById("namesList");
-    const clubName = document.getElementById("clubName").value.trim();
-    const certificateDate = document.getElementById("certificateDate").value.trim();
     const fontSelector = document.getElementById("fontSelector");
     const fontSizeSelector = document.getElementById("fontSizeSelector");
     const fontPreviewText = document.getElementById("fontPreviewText");
@@ -24,36 +23,40 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Atualizar prévia da imagem do certificado
-function updatePreviewImage(className) {
-    const canvas = document.getElementById("imagePreviewCanvas");
-    const ctx = canvas.getContext("2d");
+    function updatePreviewImage(className) {
+        const ctx = imagePreviewCanvas.getContext("2d");
 
-    if (!canvas || !ctx) {
-        console.error("Canvas ou contexto de desenho não encontrado!");
-        return;
+        if (!imagePreviewCanvas || !ctx) {
+            console.error("Canvas ou contexto de desenho não encontrado!");
+            return;
+        }
+
+        const fileName = className.toLowerCase().replace(/ /g, "_");
+        const imageURL = `${baseURL}${fileName}.png`;
+
+        const img = new Image();
+        img.onload = () => {
+            imagePreviewCanvas.width = img.width;
+            imagePreviewCanvas.height = img.height;
+            ctx.clearRect(0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
+            ctx.drawImage(img, 0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
+
+            // Exemplo do nome na prévia
+            ctx.font = `${selectedFontSize}px ${selectedFont}`;
+            ctx.fillStyle = "black";
+            ctx.textAlign = "center";
+            ctx.fillText("Exemplo do Nome", imagePreviewCanvas.width / 2, imagePreviewCanvas.height / 2);
+
+            console.log("Imagem carregada no canvas:", imageURL);
+        };
+
+        img.onerror = () => {
+            console.error("Erro ao carregar a imagem:", imageURL);
+        };
+
+        img.src = imageURL;
+        selectedClassImage = imageURL;
     }
-
-    const fileName = className.toLowerCase().replace(/ /g, "_");
-    const imageURL = `${baseURL}${fileName}`;
-
-    const img = new Image();
-    img.onload = () => {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        console.log("Imagem carregada no canvas:", imageURL);
-    };
-
-    img.onerror = () => {
-        console.error("Erro ao carregar a imagem:", imageURL);
-    };
-
-    img.src = imageURL;
-    selectedClassImage = imageURL;
-}
-
-
 
     // Listener para mudança de classe
     classSelector.addEventListener("change", () => {
@@ -80,6 +83,7 @@ function updatePreviewImage(className) {
         e.preventDefault();
 
         const clubName = clubNameInput.value.trim();
+        const certificateDate = certificateDateInput.value.trim();
         const names = namesList.value.trim().split("\n").filter((name) => name);
 
         if (!selectedClassImage) {
@@ -112,15 +116,15 @@ function updatePreviewImage(className) {
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
                 // Nome do clube
-            ctx.font = "24px Times New Roman";
-            ctx.fillStyle = "black";
-            ctx.textAlign = "center";
-            ctx.fillText(clubName, canvas.width / 2, (3 / 4) * canvas.height);
+                ctx.font = "24px Times New Roman";
+                ctx.fillStyle = "black";
+                ctx.textAlign = "center";
+                ctx.fillText(clubName, canvas.width / 2, (3 / 4) * canvas.height);
 
-            // Data do certificado
-            ctx.font = "20px Times New Roman";
-            ctx.fillStyle = "black";
-            ctx.fillText(certificateDate, canvas.width / 2, (3 / 4) * canvas.height + 30);
+                // Data do certificado
+                ctx.font = "20px Times New Roman";
+                ctx.fillStyle = "black";
+                ctx.fillText(certificateDate, canvas.width / 2, (3 / 4) * canvas.height + 30);
 
                 // Adicionar o nome
                 ctx.font = `${selectedFontSize}px ${selectedFont}`;
@@ -139,26 +143,6 @@ function updatePreviewImage(className) {
             };
 
             img.src = selectedClassImage;
-        });
-    });
-
-    // Baixar todos os certificados em ZIP
-    downloadZipButton.addEventListener("click", () => {
-        const zip = new JSZip();
-
-        const images = certificatesContainer.querySelectorAll("img");
-        if (images.length === 0) {
-            alert("Nenhum certificado para baixar. Por favor, gere os certificados primeiro.");
-            return;
-        }
-
-        images.forEach((img, index) => {
-            const data = img.src.split(",")[1]; // Apenas a parte base64
-            zip.file(`certificado_${index + 1}.png`, data, { base64: true });
-        });
-
-        zip.generateAsync({ type: "blob" }).then((content) => {
-            saveAs(content, "certificados.zip");
         });
     });
 
