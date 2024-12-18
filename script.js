@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 ctx.drawImage(img, 0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
 
                 // Adicionar o exemplo do nome na prévia
-                ctx.font = `${selectedFontSize}px*2 ${selectedFont}`;
+                ctx.font = `${selectedFontSize*2}px ${selectedFont}`;
                 ctx.fillStyle = "black";
                 ctx.textAlign = "center";
                 ctx.fillText("Exemplo do Nome", imagePreviewCanvas.width / 2, imagePreviewCanvas.height / 2);
