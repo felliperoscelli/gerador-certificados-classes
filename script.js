@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const namesList = document.getElementById("namesList");
     const fontSelector = document.getElementById("fontSelector");
     const fontSizeSelector = document.getElementById("fontSizeSelector");
-    const fontPreviewText = document.getElementById("fontPreviewText");
+    const fontPreviewCanvas = document.getElementById("fontPreviewCanvas");
     const imagePreviewCanvas = document.getElementById("imagePreviewCanvas");
     const certificatesContainer = document.getElementById("certificatesContainer");
     const downloadZipButton = document.getElementById("downloadZip");
@@ -14,67 +14,64 @@ document.addEventListener("DOMContentLoaded", () => {
     let selectedFont = fontSelector.value;
     let selectedFontSize = parseInt(fontSizeSelector.value, 10);
 
-    // Atualizar prévia da fonte no canvas
+    // Atualizar prévia da fonte no canvas de prévia
     function updateFontPreviewOnCanvas() {
-        const ctx = imagePreviewCanvas.getContext("2d");
-        if (!ctx) {
-            console.error("Contexto do canvas não encontrado!");
-            return;
-        }
+        const ctx = fontPreviewCanvas.getContext("2d");
 
-        // Limpar o canvas antes de redesenhar
-        ctx.clearRect(0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
+        fontPreviewCanvas.width = 400; // Definir largura fixa para a prévia
+        fontPreviewCanvas.height = 100; // Definir altura fixa para a prévia
+        ctx.clearRect(0, 0, fontPreviewCanvas.width, fontPreviewCanvas.height);
 
-        // Redesenhar a imagem do certificado na prévia
-        if (selectedClassImage) {
-            const img = new Image();
-            img.onload = () => {
-                ctx.drawImage(img, 0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
+        ctx.font = `${selectedFontSize * 2}px ${selectedFont}`; // Aumentar o tamanho da fonte
+        ctx.fillStyle = "black";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
 
-                // Adicionar o exemplo do nome na prévia
-                const = previewFontSize = selectedFontSize * 2;
-                ctx.font = `${previewFontSize}px ${selectedFont}`;
-                ctx.fillStyle = "black";
-                ctx.textAlign = "center";
-                ctx.fillText("Exemplo do Nome", imagePreviewCanvas.width / 2, imagePreviewCanvas.height / 2);
-            };
-            img.src = selectedClassImage;
-        } else {
-            console.warn("Nenhuma imagem de classe selecionada.");
-        }
+        ctx.fillText("Exemplo do Nome", fontPreviewCanvas.width / 2, fontPreviewCanvas.height / 2);
     }
 
-    // Atualizar a prévia da imagem
+    // Atualizar prévia da imagem do certificado
     function updatePreviewImage(className) {
+        const ctx = imagePreviewCanvas.getContext("2d");
+
         const fileName = className.toLowerCase().replace(/ /g, "_");
         const imageURL = `${baseURL}${fileName}`;
+
         const img = new Image();
         img.onload = () => {
             imagePreviewCanvas.width = img.width;
             imagePreviewCanvas.height = img.height;
-            selectedClassImage = imageURL;
-            updateFontPreviewOnCanvas(); // Atualizar prévia da fonte no canvas
-            console.log("Imagem carregada:", imageURL);
+            ctx.clearRect(0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
+            ctx.drawImage(img, 0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
+            console.log("Imagem carregada no canvas:", imageURL);
         };
-        img.onerror = () => console.error("Erro ao carregar a imagem:", imageURL);
+
+        img.onerror = () => {
+            console.error("Erro ao carregar a imagem:", imageURL);
+        };
+
         img.src = imageURL;
+        selectedClassImage = imageURL;
     }
 
-    // Atualizar prévia ao mudar a fonte
-    function updateFontPreview() {
-        selectedFont = fontSelector.value;
-        selectedFontSize = parseInt(fontSizeSelector.value, 10);
-        updateFontPreviewOnCanvas(); // Redesenhar a prévia no canvas
-    }
-
-    // Listeners para alterações na fonte ou na classe
-    fontSelector.addEventListener("change", updateFontPreview);
-    fontSizeSelector.addEventListener("input", updateFontPreview);
+    // Listener para mudança de classe
     classSelector.addEventListener("change", () => {
         const selectedClass = classSelector.value;
         if (selectedClass) {
             updatePreviewImage(selectedClass);
         }
+    });
+
+    // Listener para mudança de fonte
+    fontSelector.addEventListener("change", () => {
+        selectedFont = fontSelector.value;
+        updateFontPreviewOnCanvas();
+    });
+
+    // Listener para mudança de tamanho da fonte
+    fontSizeSelector.addEventListener("input", () => {
+        selectedFontSize = parseInt(fontSizeSelector.value, 10);
+        updateFontPreviewOnCanvas();
     });
 
     // Gerar certificados
@@ -139,6 +136,26 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Inicializar prévia
+    // Baixar todos os certificados em ZIP
+    downloadZipButton.addEventListener("click", () => {
+        const zip = new JSZip();
+
+        const images = certificatesContainer.querySelectorAll("img");
+        if (images.length === 0) {
+            alert("Nenhum certificado para baixar. Por favor, gere os certificados primeiro.");
+            return;
+        }
+
+        images.forEach((img, index) => {
+            const data = img.src.split(",")[1]; // Apenas a parte base64
+            zip.file(`certificado_${index + 1}.png`, data, { base64: true });
+        });
+
+        zip.generateAsync({ type: "blob" }).then((content) => {
+            saveAs(content, "certificados.zip");
+        });
+    });
+
+    // Inicializar prévia da fonte
     updateFontPreviewOnCanvas();
 });
