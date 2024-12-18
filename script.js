@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Atualizar prévia ao mudar a fonte
     function updateFontPreview() {
         selectedFont = fontSelector.value;
-        selectedFontSize = parseInt(fontSizeSelector.value, 10);
+        selectedFontSize = parseInt(fontSizeSelector.value, 20);
         updateFontPreviewOnCanvas(); // Redesenhar a prévia no canvas
     }
 
