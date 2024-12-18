@@ -45,13 +45,36 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Atualizar a prévia da imagem do certificado
-    function updatePreviewImage(className) {
-        const fileName = className.toLowerCase().replace(/ /g, "_");
-        const imageURL = `${baseURL}${fileName}`; // Sem adicionar .png
-        selectedClassImage = imageURL;
+function updatePreviewImage(className) {
+    const canvas = document.getElementById("imagePreviewCanvas");
+    const ctx = canvas.getContext("2d");
 
-        updateFontPreviewOnCanvas();
+    if (!canvas || !ctx) {
+        console.error("Canvas ou contexto de desenho não encontrado!");
+        return;
     }
+
+    // Gerar o nome do arquivo sem adicionar outra extensão
+    const fileName = className.toLowerCase().replace(/ /g, "_");
+    const imageURL = `${baseURL}${fileName}`; // Certifique-se que o caminho não adiciona .png
+
+    const img = new Image();
+    img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        console.log("Imagem carregada no canvas:", imageURL);
+    };
+
+    img.onerror = () => {
+        console.error("Erro ao carregar a imagem:", imageURL);
+    };
+
+    img.src = imageURL; // Usar o caminho gerado corretamente
+    selectedClassImage = imageURL; // Atualizar o caminho da classe selecionada
+}
+
 
     // Listener para mudança de classe
     classSelector.addEventListener("change", () => {
