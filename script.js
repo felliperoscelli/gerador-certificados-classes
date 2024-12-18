@@ -17,11 +17,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Atualizar prévia da fonte diretamente na imagem de prévia
     function updateFontPreviewOnCanvas() {
-        const ctx = imagePreviewCanvas.getContext("2d");
         if (!selectedClassImage) return;
 
+        const ctx = imagePreviewCanvas.getContext("2d");
         const img = new Image();
+
         img.onload = () => {
+            imagePreviewCanvas.width = img.width;
+            imagePreviewCanvas.height = img.height;
+
+            // Limpar e desenhar a imagem
             ctx.clearRect(0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
             ctx.drawImage(img, 0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
 
@@ -32,42 +37,20 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.fillText("Exemplo do Nome", imagePreviewCanvas.width / 2, imagePreviewCanvas.height / 2);
         };
 
+        img.onerror = () => {
+            console.error("Erro ao carregar a imagem:", selectedClassImage);
+        };
+
         img.src = selectedClassImage;
     }
 
     // Atualizar a prévia da imagem do certificado
     function updatePreviewImage(className) {
-        const ctx = imagePreviewCanvas.getContext("2d");
-        if (!imagePreviewCanvas || !ctx) {
-            console.error("Canvas ou contexto de desenho não encontrado!");
-            return;
-        }
-
         const fileName = className.toLowerCase().replace(/ /g, "_");
         const imageURL = `${baseURL}${fileName}.png`;
-
-        const img = new Image();
-        img.onload = () => {
-            imagePreviewCanvas.width = img.width;
-            imagePreviewCanvas.height = img.height;
-            ctx.clearRect(0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
-            ctx.drawImage(img, 0, 0, imagePreviewCanvas.width, imagePreviewCanvas.height);
-
-            // Atualizar prévia do nome
-            ctx.font = `${selectedFontSize}px ${selectedFont}`;
-            ctx.fillStyle = "black";
-            ctx.textAlign = "center";
-            ctx.fillText("Exemplo do Nome", imagePreviewCanvas.width / 2, imagePreviewCanvas.height / 2);
-
-            console.log("Imagem carregada no canvas:", imageURL);
-        };
-
-        img.onerror = () => {
-            console.error("Erro ao carregar a imagem:", imageURL);
-        };
-
-        img.src = imageURL;
         selectedClassImage = imageURL;
+
+        updateFontPreviewOnCanvas();
     }
 
     // Listener para mudança de classe
